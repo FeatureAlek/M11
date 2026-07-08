@@ -25,3 +25,7 @@ spring:
       embedding:
         options:
           model: nomic-embed-text
+
+logging:
+  level:
+    com.accenture.springai_bootcamp_demo.service.RagAgentService: DEBUG
