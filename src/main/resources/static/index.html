@@ -120,6 +120,17 @@
             color: white;
             cursor: pointer;
         }
+        #upload {
+            padding: 0 16px;
+            border: none;
+            border-radius: 8px;
+            background: var(--panel-2);
+            color: var(--text);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        #upload:hover { background: #334155; }
+        #upload:disabled { opacity: 0.5; cursor: default; }
         #send:disabled { opacity: 0.5; cursor: default; }
         #error { color: #f87171; padding: 0 20px 10px; min-height: 18px; font-size: 13px; }
     </style>
@@ -136,6 +147,8 @@
     <div id="error"></div>
     <form id="composer">
         <textarea id="input" rows="2" placeholder="Type a chatMessage and press Enter..." disabled></textarea>
+        <input type="file" id="file-input" hidden />
+        <button id="upload" type="button" disabled>📎 Upload</button>
         <button id="send" type="submit" disabled>Send</button>
     </form>
 </main>

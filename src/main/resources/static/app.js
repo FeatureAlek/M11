@@ -13,7 +13,21 @@ const api = {
             throw new Error(problem.detail || 'Request failed');
         }
         return r.json();
-    })
+    }),
+    uploadDocument: (id, file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return fetch(`/api/chats/${id}/documents`, {
+            method: 'POST',
+            body: formData
+        }).then(async r => {
+            if (!r.ok) {
+                const problem = await r.json().catch(() => ({}));
+                throw new Error(problem.detail || 'Upload failed');
+            }
+            return r.json();
+        });
+    }
 };
 
 const els = {
@@ -24,7 +38,9 @@ const els = {
     send: document.getElementById('send'),
     form: document.getElementById('composer'),
     error: document.getElementById('error'),
-    newChat: document.getElementById('new-chat')
+    newChat: document.getElementById('new-chat'),
+    uploadBtn: document.getElementById('upload'),
+    fileInput: document.getElementById('file-input')
 };
 
 let activeChatId = null;
@@ -36,6 +52,7 @@ function setError(message) {
 function setComposerEnabled(enabled) {
     els.input.disabled = !enabled;
     els.send.disabled = !enabled;
+    els.uploadBtn.disabled = !enabled;
 }
 
 async function refreshChatList() {
@@ -159,6 +176,41 @@ els.input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         els.form.requestSubmit();
+    }
+});
+
+function appendSystemNote(text) {
+    els.messages.querySelector('.empty')?.remove();
+    const note = document.createElement('div');
+    note.className = 'msg assistant';
+    note.style.opacity = '0.7';
+    note.style.fontStyle = 'italic';
+    note.textContent = text;
+    els.messages.appendChild(note);
+    els.messages.scrollTop = els.messages.scrollHeight;
+}
+
+async function uploadFile(file) {
+    setError('');
+    setComposerEnabled(false);
+    appendSystemNote(`Uploading "${file.name}"...`);
+    try {
+        const doc = await api.uploadDocument(activeChatId, file);
+        appendSystemNote(`✅ "${doc.filename}" uploaded and indexed (${doc.chunkCount} chunks). Ask me about it!`);
+    } catch (err) {
+        appendSystemNote(`❌ Failed to upload "${file.name}": ${err.message}`);
+    } finally {
+        setComposerEnabled(true);
+        els.fileInput.value = '';
+    }
+}
+
+els.uploadBtn.onclick = () => els.fileInput.click();
+
+els.fileInput.addEventListener('change', () => {
+    const file = els.fileInput.files[0];
+    if (file && activeChatId) {
+        uploadFile(file);
     }
 });
 

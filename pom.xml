@@ -69,7 +69,13 @@
 			<artifactId>spring-ai-starter-model-ollama</artifactId>
 		</dependency>
 
-		<!-- Uncomment if implementing RAG with vector store (needs Postgres+pgvector) -->
+		<!-- Spring AI - core vector store classes (SimpleVectorStore), used for in-memory RAG -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-vector-store</artifactId>
+		</dependency>
+
+		<!-- Uncomment if you want a persistent vector store instead of the in-memory SimpleVectorStore (needs Postgres+pgvector) -->
 		<!--
         <dependency>
            <groupId>org.springframework.ai</groupId>
